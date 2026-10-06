@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>Inventory Management</h1>
+    <p>Track and manage your store inventory.</p>
+  </header>
+
+  <main>
+
+    <section id="inventory-summary">
+      <h2>Inventory Summary</h2>
+
+      <div id="summary-cards">
+        <article>
+          <h3>Total Products</h3>
+          <p id="total-products">0</p>
+        </article>
+
+        <article>
+          <h3>Total Units</h3>
+          <p id="total-units">0</p>
+        </article>
+
+        <article>
+          <h3>Inventory Value</h3>
+          <p id="inventory-value">$0.00</p>
+        </article>
+
+        <article>
+          <h3>Low Stock</h3>
+          <p id="low-stock">0</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="inventory">
+      <h2>Inventory</h2>
+
+      <div id="inventory-controls">
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Search products..."
+        >
+
+        <select id="category-select">
+          <option value="all">All Categories</option>
+          <option value="tops">Tops</option>
+          <option value="bottoms">Bottoms</option>
+          <option value="outerwear">Outerwear</option>
+          <option value="footwear">Footwear</option>
+        </select>
+
+        <select id="sort-select">
+          <option value="default">Sort By</option>
+          <option value="name">Name</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="quantity-low">Quantity: Low to High</option>
+          <option value="quantity-high">Quantity: High to Low</option>
+        </select>
+
+        <button id="add-product">Add Product</button>
+        <dialog id="product-form-container">
+          <h2>Add Product</h2>
+
+          <form id="product-form">
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" required>
+
+            <label for="product-category">Category</label>
+            <select id="product-category" required>
+              <option value="">Select a category</option>
+              <option value="Tops">Tops</option>
+              <option value="Bottoms">Bottoms</option>
+              <option value="Outerwear">Outerwear</option>
+              <option value="Footwear">Footwear</option>
+            </select>
+
+            <label for="product-price">Price</label>
+            <input type="number" id="product-price" min="0" step="0.01" required>
+
+            <label for="product-quantity">Quantity</label>
+            <input type="number" id="product-quantity" min="0" required>
+
+            <button type="submit">Add Product</button>
+            <button type="button" id="cancel-product">Cancel</button>
+          </form>
+        </dialog>
+      </div>
+
+      <div id="inventory-list">
+      </div>
+    </section>
+
+  </main>
+
+  <script src="inventory.js"></script>
+</body>
+</html>
