@@ -116,3 +116,12 @@ h2 {
   border-radius: 8px;
   padding: 1.5rem;
 }
+
+.delete-button {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+}

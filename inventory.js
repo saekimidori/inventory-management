@@ -115,6 +115,7 @@ function renderInventory() {
       <p>Category: ${escapeHTML(product.category)}</p>
       <p>Price: $${product.price.toFixed(2)}</p>
       <p>Quantity: ${product.quantity}${isLowStock(product) ? " <strong>(Low stock)</strong>" : ""}</p>
+      <button type="button" class="delete-button">Delete</button>
     `
  
     inventoryList.appendChild(productElement)
@@ -153,6 +154,23 @@ function refresh() {
 searchInput.addEventListener('input', renderInventory)
 categorySelect.addEventListener('change', renderInventory)
 sortSelect.addEventListener('change', renderInventory)
+
+inventoryList.addEventListener('click', function(event) {
+  const deleteButton = event.target.closest('.delete-button')
+  if (!deleteButton) return
+ 
+  const id = Number(deleteButton.closest('article').dataset.id)
+  const index = inventory.findIndex(function(product) {
+    return product.id === id
+  })
+  if (index === -1) return
+ 
+  if (!confirm(`Delete "${inventory[index].name}"?`)) return
+ 
+  inventory.splice(index, 1)
+  refresh()
+})
+
 
 addProductButton.addEventListener('click', function() {
     productFormContainer.showModal()
