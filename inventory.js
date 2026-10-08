@@ -1,6 +1,8 @@
 const LOW_STOCK_THRESHOLD = 5
 
-const inventory = [
+const STORAGE_KEY = 'inventory-products'
+
+const defaultProducts = [
   {
     id: 1,
     name: "Denim Jacket",
@@ -31,7 +33,29 @@ const inventory = [
   }
 ]
 
-let nextId = Math.max(...inventory.map(function(p) { return p.id })) + 1
+function loadInventory() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved === null) return defaultProducts.slice()
+    const parsed = JSON.parse(saved)
+    if (Array.isArray(parsed)) return parsed
+  } catch (error) {
+    console.error('Could not load inventory:', error)
+  }
+  return defaultProducts.slice()
+}
+ 
+function saveInventory() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory))
+  } catch (error) {
+    console.error('Could not save inventory:', error)
+  }
+}
+ 
+const inventory = loadInventory()
+
+let nextId = Math.max(0, ...inventory.map(function(p) { return p.id })) + 1
 
 const inventoryList = document.querySelector('#inventory-list')
 const totalProducts = document.querySelector('#total-products')
@@ -169,6 +193,7 @@ inventoryList.addEventListener('click', function(event) {
   if (!confirm(`Delete "${inventory[index].name}"?`)) return
  
   inventory.splice(index, 1)
+  saveInventory()
   refresh()
 })
 
@@ -284,6 +309,7 @@ productForm.addEventListener('submit', function(event) {
     if (product) Object.assign(product, data)
   }
 
+  saveInventory()
   productFormContainer.close()
   refresh()
 })
