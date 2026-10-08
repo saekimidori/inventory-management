@@ -117,8 +117,17 @@ h2 {
   padding: 1.5rem;
 }
 
-.delete-button {
+.delete-product {
   background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.edit-product {
+  background-color: #5bc0de;
   color: white;
   border: none;
   padding: 10px 15px;

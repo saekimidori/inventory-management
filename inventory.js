@@ -44,7 +44,6 @@ const categorySelect = document.querySelector('#category-select')
 const sortSelect = document.querySelector('#sort-select')
 
 const addProductButton = document.querySelector('#add-product')
-const cancelProductButton = document.querySelector("#cancel-product")
 const productFormContainer = document.querySelector('#product-form-container')
 const productForm = document.querySelector('#product-form')
 
@@ -115,7 +114,8 @@ function renderInventory() {
       <p>Category: ${escapeHTML(product.category)}</p>
       <p>Price: $${product.price.toFixed(2)}</p>
       <p>Quantity: ${product.quantity}${isLowStock(product) ? " <strong>(Low stock)</strong>" : ""}</p>
-      <button type="button" class="delete-button">Delete</button>
+      <button type="button" class="edit-product">Edit</button>
+      <button type="button" class="delete-product">Delete</button>
     `
  
     inventoryList.appendChild(productElement)
@@ -155,8 +155,9 @@ searchInput.addEventListener('input', renderInventory)
 categorySelect.addEventListener('change', renderInventory)
 sortSelect.addEventListener('change', renderInventory)
 
+// Delete product
 inventoryList.addEventListener('click', function(event) {
-  const deleteButton = event.target.closest('.delete-button')
+  const deleteButton = event.target.closest('.delete-product')
   if (!deleteButton) return
  
   const id = Number(deleteButton.closest('article').dataset.id)
@@ -171,13 +172,70 @@ inventoryList.addEventListener('click', function(event) {
   refresh()
 })
 
+const cancelProductButton = document.querySelector('#cancel-product')
+const formTitle = document.querySelector('#product-form-title')
+const productNameInput = document.querySelector('#product-name')
+const productCategoryInput = document.querySelector('#product-category')
+const formSubmitButton = productForm.querySelector('button[type="submit"]')
 
+const formError = document.createElement('p')
+formError.id = 'product-form-error'
+formError.setAttribute('role', 'alert')
+formError.style.color = '#d9534f'
+formError.hidden = true
+formSubmitButton.before(formError)
+ 
+function showFormError(message) {
+  formError.textContent = message
+  formError.hidden = false
+}
+ 
+function clearFormError() {
+  formError.textContent = ''
+  formError.hidden = true
+}
+
+productNameInput.addEventListener("input", clearFormError)
+productCategoryInput.addEventListener("change", clearFormError)
+
+let editingId = null // null = adding a new product, otherwise the id being edited
+
+function openProductForm(product) {
+  if (product) {
+    editingId = product.id
+    document.querySelector('#product-name').value = product.name
+    document.querySelector('#product-category').value = product.category
+    document.querySelector('#product-price').value = product.price
+    document.querySelector('#product-quantity').value = product.quantity
+    if (formTitle) formTitle.textContent = 'Edit Product'
+    formSubmitButton.textContent = 'Save Changes'
+  } else {
+    editingId = null
+    productForm.reset()
+    if (formTitle) formTitle.textContent = 'Add Product'
+    formSubmitButton.textContent = 'Add Product'
+  }
+ 
+  productFormContainer.showModal()
+}
+
+inventoryList.addEventListener('click', function(event) {
+  // Edit product
+  const editButton = event.target.closest('.edit-product')
+  if (!editButton) return
+ 
+  const id = Number(editButton.closest('article').dataset.id)
+  const product = inventory.find(function(item) {
+    return item.id === id
+  })
+  if (product) openProductForm(product)
+})
+ 
 addProductButton.addEventListener('click', function() {
-    productFormContainer.showModal()
+  openProductForm()
 })
 
 cancelProductButton.addEventListener('click', function() {
-  productForm.reset()
   productFormContainer.close()
 })
 
@@ -187,19 +245,46 @@ productFormContainer.addEventListener('click', function(event) {
   }
 })
 
+// Fires however the dialog closes (submit, Cancel, Esc, backdrop): start clean next time
+productFormContainer.addEventListener('close', function() {
+  productForm.reset()
+  editingId = null
+})
+
 productForm.addEventListener('submit', function(event) {
   event.preventDefault()
  
-  inventory.push({
-    id: nextId++,
-    name: document.querySelector('#product-name').value.trim(),
-    category: document.querySelector('#product-category').value,
-    price: parseFloat(document.querySelector('#product-price').value),
-    quantity: parseInt(document.querySelector('#product-quantity').value, 10)
+  const data = {
+      name: document.querySelector('#product-name').value.trim(),
+      category: document.querySelector('#product-category').value,
+      price: parseFloat(document.querySelector('#product-price').value),
+      quantity: parseInt(document.querySelector('#product-quantity').value, 10)
+  }
+
+  const isDuplicate = inventory.some(function(item) {
+    return (
+      item.id !== editingId &&
+      item.name.toLowerCase() === data.name.toLowerCase() &&
+      item.category === data.category
+    )
   })
  
-  productForm.reset()
-  productFormContainer.hidden = true
+  if (isDuplicate) {
+    showFormError('This product already exists in this category.')
+    productNameInput.focus()
+    return
+  }
+ 
+  if (editingId === null) {
+    inventory.push({ id: nextId++, ...data })
+  } else {
+    const product = inventory.find(function(item) {
+      return item.id === editingId
+    })
+    if (product) Object.assign(product, data)
+  }
+
+  productFormContainer.close()
   refresh()
 })
  
