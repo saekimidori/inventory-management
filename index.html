@@ -69,6 +69,8 @@
           <option value="quantity-high">Quantity: High to Low</option>
         </select>
 
+        <button type="button" id="clear-filters">Clear filters</button>
+
         <button id="add-product">Add Product</button>
         <dialog id="product-form-container">
           <h2 id="product-form-title">Add Product</h2>
@@ -91,12 +93,16 @@
 
             <label for="product-quantity">Quantity</label>
             <input type="number" id="product-quantity" min="0" required>
+            <label for="product-reorder-level">Reorder Level</label>
+            <input type="number" id="product-reorder-level" min="0" required>
 
             <button type="submit" id="add-button">Add Product</button>
             <button type="button" id="cancel-product">Cancel</button>
           </form>
         </dialog>
       </div>
+
+      <p id="results-count"></p>
 
       <div id="inventory-list">
       </div>

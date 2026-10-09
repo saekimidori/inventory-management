@@ -1,4 +1,4 @@
-const LOW_STOCK_THRESHOLD = 5
+const DEFAULT_REORDER_LEVEL = 5
 
 const STORAGE_KEY = 'inventory-products'
 
@@ -66,10 +66,13 @@ const lowStock = document.querySelector('#low-stock')
 const searchInput = document.querySelector('#search-input')
 const categorySelect = document.querySelector('#category-select')
 const sortSelect = document.querySelector('#sort-select')
+const clearFiltersButton = document.querySelector('#clear-filters')
+const resultsCount = document.querySelector('#results-count')
 
 const addProductButton = document.querySelector('#add-product')
 const productFormContainer = document.querySelector('#product-form-container')
 const productForm = document.querySelector('#product-form')
+const productReorderInput = document.querySelector('#product-reorder-level')
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
@@ -88,8 +91,12 @@ function escapeHTML(text) {
   return div.innerHTML
 }
 
+function getReorderLevel(product) {
+  return product.reorderLevel ?? DEFAULT_REORDER_LEVEL
+}
+
 function isLowStock(product) {
-  return product.quantity <= LOW_STOCK_THRESHOLD
+  return product.quantity <= getReorderLevel(product)
 }
 
 function stockLabel(product) {
@@ -130,6 +137,9 @@ function getVisibleProducts() {
 function renderInventory() {
   const products = getVisibleProducts()
   inventoryList.innerHTML = ''
+
+  resultsCount.textContent =
+  `Showing ${products.length} of ${inventory.length} ${inventory.length === 1 ? 'product' : 'products'}`
 
   statusMessage.hidden = products.length > 0
  
@@ -178,10 +188,7 @@ function updateSummary() {
   inventoryValue.textContent = currency.format(value)
 
   // Low-stock products
-  const lowStockProducts = inventory.filter(function(product) {
-    return product.quantity <= 5
-  })
-  lowStock.textContent = lowStockProducts.length
+  lowStock.textContent = inventory.filter(isLowStock).length
 }
 
 function refresh() {
@@ -192,6 +199,13 @@ function refresh() {
 searchInput.addEventListener('input', renderInventory)
 categorySelect.addEventListener('change', renderInventory)
 sortSelect.addEventListener('change', renderInventory)
+
+clearFiltersButton.addEventListener('click', function() {
+  searchInput.value = ''
+  categorySelect.value = 'all'
+  sortSelect.value = 'default'
+  renderInventory()
+})
 
 // Delete product
 inventoryList.addEventListener('click', function(event) {
@@ -235,8 +249,8 @@ function clearFormError() {
   formError.hidden = true
 }
 
-productNameInput.addEventListener("input", clearFormError)
-productCategoryInput.addEventListener("change", clearFormError)
+productNameInput.addEventListener('input', clearFormError)
+productCategoryInput.addEventListener('change', clearFormError)
 
 let editingId = null // null = adding a new product, otherwise the id being edited
 
@@ -247,11 +261,13 @@ function openProductForm(product) {
     document.querySelector('#product-category').value = product.category
     document.querySelector('#product-price').value = product.price
     document.querySelector('#product-quantity').value = product.quantity
+    productReorderInput.value = getReorderLevel(product)
     if (formTitle) formTitle.textContent = 'Edit Product'
     formSubmitButton.textContent = 'Save Changes'
   } else {
     editingId = null
     productForm.reset()
+    productReorderInput.value = DEFAULT_REORDER_LEVEL
     if (formTitle) formTitle.textContent = 'Add Product'
     formSubmitButton.textContent = 'Add Product'
   }
@@ -298,7 +314,8 @@ productForm.addEventListener('submit', function(event) {
       name: document.querySelector('#product-name').value.trim(),
       category: document.querySelector('#product-category').value,
       price: parseFloat(document.querySelector('#product-price').value),
-      quantity: parseInt(document.querySelector('#product-quantity').value, 10)
+      quantity: parseInt(document.querySelector('#product-quantity').value, 10),
+      reorderLevel: parseInt(productReorderInput.value, 10)
   }
 
   if (data.name === '') {
