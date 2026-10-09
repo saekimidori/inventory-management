@@ -71,6 +71,14 @@ const addProductButton = document.querySelector('#add-product')
 const productFormContainer = document.querySelector('#product-form-container')
 const productForm = document.querySelector('#product-form')
 
+let statusMessage = document.querySelector('#status-message')
+if (!statusMessage) {
+  statusMessage = document.createElement('p')
+  statusMessage.id = 'status-message'
+}
+statusMessage.hidden = true
+inventoryList.before(statusMessage)
+
 // Function to escape HTML special characters to prevent errors
 function escapeHTML(text) {
   const div = document.createElement('div')
@@ -114,14 +122,13 @@ function getVisibleProducts() {
 function renderInventory() {
   const products = getVisibleProducts()
   inventoryList.innerHTML = ''
+
+  statusMessage.hidden = products.length > 0
  
   if (products.length === 0) {
-    const message = document.createElement('p')
-    message.id = 'status-message'
-    message.textContent = inventory.length === 0
+    statusMessage.textContent = inventory.length === 0
       ? 'No products yet.'
       : 'No products match your search.'
-    inventoryList.appendChild(message)
     return
   }
  
@@ -145,7 +152,6 @@ function renderInventory() {
     inventoryList.appendChild(productElement)
   })
 }
-
 
 function updateSummary() {
   // Total products
@@ -203,6 +209,7 @@ const productNameInput = document.querySelector('#product-name')
 const productCategoryInput = document.querySelector('#product-category')
 const formSubmitButton = productForm.querySelector('button[type="submit"]')
 
+// Form error message
 const formError = document.createElement('p')
 formError.id = 'product-form-error'
 formError.setAttribute('role', 'alert')
