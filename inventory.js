@@ -301,6 +301,12 @@ productForm.addEventListener('submit', function(event) {
       quantity: parseInt(document.querySelector('#product-quantity').value, 10)
   }
 
+  if (data.name === '') {
+    showFormError('Please enter a product name.')
+    productNameInput.focus()
+    return
+  }
+
   const isDuplicate = inventory.some(function(item) {
     return (
       item.id !== editingId &&
