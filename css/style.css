@@ -4,14 +4,14 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  color: #222;
+  font-family: optima;
+  background: #322040;
+  color: #cfa4ff;
 }
 
 header {
   padding: 30px;
-  background: white;
+  background: #19002d;
   border-bottom: 1px solid #ddd;
 }
 
@@ -21,7 +21,7 @@ header h1 {
 
 header p {
   margin: 0;
-  color: #666;
+  color: #ffffff;
 }
 
 main {
@@ -34,6 +34,21 @@ h2 {
   margin-top: 0;
 }
 
+button {
+  font-family: optima;
+  color: #ffffff;
+  background: #33164a;
+  padding: 7px 13px;
+  border: 1px solid #fff; 
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  color: #33164a;
+  background: #ffffff;
+} 
+
 /* Summary */
 
 #summary-cards {
@@ -45,7 +60,8 @@ h2 {
 
 #summary-cards article {
   padding: 20px;
-  background: white;
+  color: #ffffff;
+  background: #33164a;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
@@ -70,10 +86,14 @@ h2 {
 }
 
 #inventory-controls input,
-#inventory-controls select,
-#inventory-controls button {
+#inventory-controls select {
   padding: 10px;
+  font-family: optima;
   font-size: 16px;
+  background: #33164a;
+  color: #ffffff;
+  border: 1px solid #fff; 
+  border-radius: 8px;
 }
 
 #inventory-controls input {
@@ -81,7 +101,7 @@ h2 {
 }
 
 #inventory-controls button {
-  cursor: pointer;
+  font-size: 16px;
 }
 
 /* Inventory list */
@@ -94,7 +114,8 @@ h2 {
 
 #inventory-list article {
   padding: 20px;
-  background: white;
+  color: #ffffff;
+  background: #33164a;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
@@ -107,30 +128,48 @@ h2 {
   margin: 8px 0;
 }
 
+.delete-product:hover {
+  color: #ffffff;
+  background: #c9302c;
+}
+
 #product-form-container::backdrop {
   background: #00000080;
 }
 
 #product-form-container {
-  border: none;
+  color: #ffffff;
+  background: #33164a;
+  border: 1px solid #fff;
   border-radius: 8px;
   padding: 1.5rem;
 }
 
-.delete-product {
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 4px;
+#product-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
+  min-width: 18rem;
 }
 
-.edit-product {
-  background-color: #5bc0de;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 4px;
+#product-form label,
+#product-form input,
+#product-form select,
+#product-form p {
+  grid-column: 1 / -1;
+}
+
+#product-form label {
+  margin-top: 0.5rem;
+}
+
+#product-form input,
+#product-form select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+#product-form button {
+  margin-top: 1rem;
 }
