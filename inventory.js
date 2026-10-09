@@ -71,6 +71,8 @@ const addProductButton = document.querySelector('#add-product')
 const productFormContainer = document.querySelector('#product-form-container')
 const productForm = document.querySelector('#product-form')
 
+const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+
 let statusMessage = document.querySelector('#status-message')
 if (!statusMessage) {
   statusMessage = document.createElement('p')
@@ -88,6 +90,12 @@ function escapeHTML(text) {
 
 function isLowStock(product) {
   return product.quantity <= LOW_STOCK_THRESHOLD
+}
+
+function stockLabel(product) {
+  if (product.quantity === 0) return ' <strong>(Out of stock)</strong>'
+  if (isLowStock(product)) return ' <strong>(Low stock)</strong>'
+  return ''
 }
 
 function getVisibleProducts() {
@@ -143,8 +151,8 @@ function renderInventory() {
     productElement.innerHTML = `
       <h3>${escapeHTML(product.name)}</h3>
       <p>Category: ${escapeHTML(product.category)}</p>
-      <p>Price: $${product.price.toFixed(2)}</p>
-      <p>Quantity: ${product.quantity}${isLowStock(product) ? " <strong>(Low stock)</strong>" : ""}</p>
+      <p>Price: ${currency.format(product.price)}</p>
+      <p>Quantity: ${product.quantity}${stockLabel(product)}</p>
       <button type="button" class="edit-product">Edit</button>
       <button type="button" class="delete-product">Delete</button>
     `
@@ -167,7 +175,7 @@ function updateSummary() {
   const value = inventory.reduce(function(total, product) {
     return total + (product.price * product.quantity)
   }, 0)
-  inventoryValue.textContent = `$${value.toFixed(2)}`
+  inventoryValue.textContent = currency.format(value)
 
   // Low-stock products
   const lowStockProducts = inventory.filter(function(product) {
