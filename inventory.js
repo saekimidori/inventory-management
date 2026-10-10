@@ -134,8 +134,20 @@ function getVisibleProducts() {
   return products
 }
 
-function renderInventory() {
-  const products = getVisibleProducts()
+let lastShownOrder = []
+
+function renderInventory(options) {
+  const keepOrder = Boolean(options && options.keepOrder)
+  
+  const products = keepOrder
+    ? lastShownOrder
+        .map(function(id) {
+          return inventory.find(function(product) { return product.id === id })
+        })
+        .filter(Boolean)
+    : getVisibleProducts()
+ 
+  lastShownOrder = products.map(function(product) { return product.id })
   inventoryList.innerHTML = ''
 
   resultsCount.textContent =
@@ -163,8 +175,16 @@ function renderInventory() {
       <p>Category: ${escapeHTML(product.category)}</p>
       <p>Price: ${currency.format(product.price)}</p>
       <p>Quantity: ${product.quantity}${stockLabel(product)}</p>
-      <button type="button" class="edit-product">Edit</button>
-      <button type="button" class="delete-product">Delete</button>
+        <div class='quantity-controls'>
+          <button type='button' class='adjust-quantity' data-change='-1'
+            aria-label='Decrease quantity of ${escapeHTML(product.name)}'
+            ${product.quantity === 0 ? 'disabled' : ''}>&minus;</button>
+          <button type='button' class='adjust-quantity' data-change='1'
+            aria-label='Increase quantity of ${escapeHTML(product.name)}'>+</button>
+        </div>
+      <p>Reorder level: ${getReorderLevel(product)}</p>
+      <button type='button' class='edit-product'>Edit</button>
+      <button type='button' class='delete-product'>Delete</button>
     `
  
     inventoryList.appendChild(productElement)
@@ -191,8 +211,8 @@ function updateSummary() {
   lowStock.textContent = inventory.filter(isLowStock).length
 }
 
-function refresh() {
-  renderInventory()
+function refresh(options) {
+  renderInventory(options)
   updateSummary()
 }
 
@@ -205,6 +225,28 @@ clearFiltersButton.addEventListener('click', function() {
   categorySelect.value = 'all'
   sortSelect.value = 'default'
   renderInventory()
+})
+
+inventoryList.addEventListener('click', function(event) {
+  const adjustButton = event.target.closest('.adjust-quantity')
+  if (!adjustButton) return
+ 
+  const id = Number(adjustButton.closest('article').dataset.id)
+  const change = Number(adjustButton.dataset.change)
+  const product = inventory.find(function(item) {
+    return item.id === id
+  })
+  if (!product) return
+ 
+  product.quantity = Math.max(0, product.quantity + change) // never below zero
+  saveInventory()
+  refresh({ keepOrder: true })
+ 
+  // Re-rendering replaced the buttons, so give keyboard focus back to the one just used
+  const sameButton = inventoryList.querySelector(
+    `article[data-id="${id}"] .adjust-quantity[data-change="${change}"]`
+  )
+  if (sameButton) sameButton.focus()
 })
 
 // Delete product

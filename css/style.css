@@ -124,6 +124,22 @@ button:hover {
   margin: 8px 0;
 }
 
+.quantity-controls { 
+  display: flex; 
+  gap: 0.5rem; 
+  margin: 0.25rem 0 0.75rem; 
+}
+
+.adjust-quantity { 
+  min-width: 2.5rem; 
+  padding: 0.35rem 0.6rem; 
+}
+
+.adjust-quantity:disabled { 
+  opacity: 0.4; 
+  cursor: not-allowed; 
+}
+
 #product-form-container::backdrop {
   background: #00000080;
 }
