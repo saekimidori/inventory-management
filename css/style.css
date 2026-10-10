@@ -5,14 +5,13 @@
 body {
   margin: 0;
   font-family: optima;
-  background: #322040;
-  color: #cfa4ff;
+  background: #f3e4ff;
 }
 
 header {
   padding: 30px;
-  background: #19002d;
-  border-bottom: 1px solid #ddd;
+  background: #8e64b1;
+  border-bottom: 1px solid #5c05a3;
 }
 
 header h1 {
@@ -36,17 +35,16 @@ h2 {
 
 button {
   font-family: optima;
-  color: #ffffff;
-  background: #33164a;
+  background: #f9f3fe;
   padding: 7px 13px;
-  border: 1px solid #fff; 
+  border: 1px solid #5c05a3; 
   border-radius: 8px;
   cursor: pointer;
 }
 
 button:hover {
-  color: #33164a;
-  background: #ffffff;
+  color: #ffffff;
+  background: #945dc1;
 } 
 
 /* Summary */
@@ -60,9 +58,8 @@ button:hover {
 
 #summary-cards article {
   padding: 20px;
-  color: #ffffff;
-  background: #33164a;
-  border: 1px solid #ddd;
+  background: #f9f3fe;
+  border: 1px solid #5c05a3;
   border-radius: 8px;
 }
 
@@ -90,9 +87,9 @@ button:hover {
   padding: 10px;
   font-family: optima;
   font-size: 16px;
-  background: #33164a;
-  color: #ffffff;
-  border: 1px solid #fff; 
+  background: #f9f3fe;
+  color: #33164a;
+  border: 1px solid #5c05a3;
   border-radius: 8px;
 }
 
@@ -114,9 +111,8 @@ button:hover {
 
 #inventory-list article {
   padding: 20px;
-  color: #ffffff;
-  background: #33164a;
-  border: 1px solid #ddd;
+  background: #f9f3fe;
+  border: 1px solid #5c05a3;
   border-radius: 8px;
 }
 
@@ -128,19 +124,13 @@ button:hover {
   margin: 8px 0;
 }
 
-.delete-product:hover {
-  color: #ffffff;
-  background: #c9302c;
-}
-
 #product-form-container::backdrop {
   background: #00000080;
 }
 
 #product-form-container {
-  color: #ffffff;
-  background: #33164a;
-  border: 1px solid #fff;
+  background: #f3e4ff;
+  border: 1px solid #5c05a3;
   border-radius: 8px;
   padding: 1.5rem;
 }
