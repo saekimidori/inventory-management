@@ -1,3 +1,4 @@
 node_modules
 inventory.db
 inventory.db-*
+.DS_Store
