@@ -1,61 +1,26 @@
 const DEFAULT_REORDER_LEVEL = 5
 
-const STORAGE_KEY = 'inventory-products'
+let inventory = []
 
-const defaultProducts = [
-  {
-    id: 1,
-    name: "Denim Jacket",
-    category: "Outerwear",
-    price: 59.99,
-    quantity: 12
-  },
-  {
-    id: 2,
-    name: "Basic T-Shirt",
-    category: "Tops",
-    price: 24.99,
-    quantity: 3
-  },
-  {
-    id: 3,
-    name: "Slim Jeans",
-    category: "Bottoms",
-    price: 49.99,
-    quantity: 18
-  },
-  {
-    id: 4,
-    name: "Running Sneakers",
-    category: "Footwear",
-    price: 79.99,
-    quantity: 7
-  }
-]
-
-function loadInventory() {
+async function api(url, options) {
+  let response
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === null) return defaultProducts.slice()
-    const parsed = JSON.parse(saved)
-    if (Array.isArray(parsed)) return parsed
+    response = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    })
   } catch (error) {
-    console.error('Could not load inventory:', error)
+    throw new Error('Can\'t reach the server. Is it running?')
   }
-  return defaultProducts.slice()
-}
  
-function saveInventory() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory))
-  } catch (error) {
-    console.error('Could not save inventory:', error)
+  if (response.status === 204) return null // success with nothing to send back (delete)
+ 
+  const body = await response.json().catch(function() { return null })
+  if (!response.ok) {
+    throw new Error(body && body.error ? body.error : 'Request failed.')
   }
+  return body
 }
- 
-const inventory = loadInventory()
-
-let nextId = Math.max(0, ...inventory.map(function(p) { return p.id })) + 1
 
 const inventoryList = document.querySelector('#inventory-list')
 const totalProducts = document.querySelector('#total-products')
@@ -227,9 +192,11 @@ clearFiltersButton.addEventListener('click', function() {
   renderInventory()
 })
 
-inventoryList.addEventListener('click', function(event) {
+let requestInFlight = false
+
+inventoryList.addEventListener('click', async function(event) {
   const adjustButton = event.target.closest('.adjust-quantity')
-  if (!adjustButton) return
+  if (!adjustButton || requestInFlight) return
  
   const id = Number(adjustButton.closest('article').dataset.id)
   const change = Number(adjustButton.dataset.change)
@@ -238,11 +205,25 @@ inventoryList.addEventListener('click', function(event) {
   })
   if (!product) return
  
-  product.quantity = Math.max(0, product.quantity + change) // never below zero
-  saveInventory()
+  const newQuantity = Math.max(0, product.quantity + change)
+  if (newQuantity === product.quantity) return
+
+  requestInFlight = true
+  try {
+    const updated = await api(`/api/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify ({ ...product, quantity: newQuantity })
+    })
+    Object.assign(product, updated)
+  } catch (error) {
+    alert(error.message)
+    return
+  } finally {
+    requestInFlight = false
+  }
+  
   refresh({ keepOrder: true })
- 
-  // Re-rendering replaced the buttons, so give keyboard focus back to the one just used
+
   const sameButton = inventoryList.querySelector(
     `article[data-id="${id}"] .adjust-quantity[data-change="${change}"]`
   )
@@ -250,7 +231,7 @@ inventoryList.addEventListener('click', function(event) {
 })
 
 // Delete product
-inventoryList.addEventListener('click', function(event) {
+inventoryList.addEventListener('click', async function(event) {
   const deleteButton = event.target.closest('.delete-product')
   if (!deleteButton) return
  
@@ -261,9 +242,17 @@ inventoryList.addEventListener('click', function(event) {
   if (index === -1) return
  
   if (!confirm(`Delete "${inventory[index].name}"?`)) return
- 
-  inventory.splice(index, 1)
-  saveInventory()
+
+  try {
+    await api(`/api/products/${id}`, { method: 'DELETE' })
+  } catch (error) {
+    alert(error.message)
+    return
+  }
+
+  inventory = inventory.filter(function(product) {
+    return product.id !== id
+  })
   refresh()
 })
 
@@ -271,7 +260,7 @@ const cancelProductButton = document.querySelector('#cancel-product')
 const formTitle = document.querySelector('#product-form-title')
 const productNameInput = document.querySelector('#product-name')
 const productCategoryInput = document.querySelector('#product-category')
-const formSubmitButton = productForm.querySelector('button[type="submit"]')
+const formSubmitButton = productForm.querySelector("button[type='submit']")
 
 // Form error message
 const formError = document.createElement('p')
@@ -346,10 +335,11 @@ productFormContainer.addEventListener('click', function(event) {
 // Fires however the dialog closes (submit, Cancel, Esc, backdrop): start clean next time
 productFormContainer.addEventListener('close', function() {
   productForm.reset()
+  clearFormError()
   editingId = null
 })
 
-productForm.addEventListener('submit', function(event) {
+productForm.addEventListener('submit', async function(event) {
   event.preventDefault()
  
   const data = {
@@ -379,19 +369,44 @@ productForm.addEventListener('submit', function(event) {
     productNameInput.focus()
     return
   }
- 
-  if (editingId === null) {
-    inventory.push({ id: nextId++, ...data })
-  } else {
-    const product = inventory.find(function(item) {
-      return item.id === editingId
-    })
-    if (product) Object.assign(product, data)
+
+  formSubmitButton.disabled = true
+
+  try {
+    if (editingId === null) {
+      inventory.push(await api('/api/products', { method: 'POST', body: JSON.stringify(data) }))
+    } else {
+      const updated = await api(`/api/products/${editingId}`, { 
+        method: 'PUT', 
+        body: JSON.stringify(data) 
+      })
+      inventory = inventory.map(function(item) {
+        return item.id === updated.id ? updated : item
+      })
+    }
+  } catch (error) {
+    showFormError(error.message)
+    return 
+  } finally {
+    formSubmitButton.disabled = false
   }
 
-  saveInventory()
   productFormContainer.close()
   refresh()
 })
+
+async function init() {
+  statusMessage.textContent = 'Loading products...'
+  statusMessage.hidden = false
+
+  try {
+    inventory = await api('/api/products')
+  } catch (error) {
+    statusMessage.textContent = `Couldn't load products: ${error.message}`
+    return
+  }
+
+  refresh()
+}
  
-refresh()
+init()
