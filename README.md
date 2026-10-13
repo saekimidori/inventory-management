@@ -36,6 +36,8 @@ The first run creates `inventory.db` and fills it with four starter products. No
 
 To restart the server automatically when files change while you're developing, run `node --watch server.js` instead.
 
+Demo resets when it restarts.
+
 ## Future Improvements
 
 - Deploy it so it can be used from more than one device
