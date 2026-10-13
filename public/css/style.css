@@ -4,6 +4,7 @@
 
 body {
   margin: 0;
+  font-size: 15px;
   font-family: optima;
   background: #f3e4ff;
 }
@@ -15,6 +16,7 @@ header {
 }
 
 header h1 {
+  font-size: 1.8rem;
   margin: 0 0 8px;
 }
 
@@ -31,6 +33,7 @@ main {
 
 h2 {
   margin-top: 0;
+  font-size: 1.5rem;
 }
 
 button {
@@ -65,12 +68,12 @@ button:hover {
 
 #summary-cards h3 {
   margin: 0 0 10px;
-  font-size: 16px;
+  font-size: 1.1rem;
 }
 
 #summary-cards p {
   margin: 0;
-  font-size: 28px;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
@@ -86,7 +89,7 @@ button:hover {
 #inventory-controls select {
   padding: 10px;
   font-family: optima;
-  font-size: 16px;
+  font-size: 1rem;
   background: #f9f3fe;
   color: #33164a;
   border: 1px solid #5c05a3;
@@ -98,7 +101,7 @@ button:hover {
 }
 
 #inventory-controls button {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 /* Inventory list */
@@ -178,4 +181,36 @@ button:hover {
 
 #product-form button {
   margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  #summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #inventory-controls {
+    flex-direction: column;
+  }
+
+  #inventory-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  #summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  #inventory-controls {
+    flex-direction: column;
+  }
+
+  #inventory-list {
+    grid-template-columns: 1fr;
+  }
+
+  #product-form {
+    min-width: 100%;
+  }
 }
