@@ -2,6 +2,10 @@
 
 A web app for tracking a clothing store's inventory. View products, add, edit and delete them, search and filter, and see at a glance what's running low.
 
+[See live demo](https://inventory-management-mddm.onrender.com/)
+
+The first load after a quiet period can take up to a minute, and the data resets to the starter products whenever the service restarts.
+
 ## Features
 
 - View products with category, price, quantity and reorder level
@@ -19,7 +23,7 @@ A web app for tracking a clothing store's inventory. View products, add, edit an
 - **Backend:** Node.js with Express
 - **Database:** SQLite, using Node's built-in `node:sqlite` module
 
-## Getting started
+## Run locally
 
 You need [Node.js](https://nodejs.org) 24 (built and tested with v24.13.1).
 
@@ -35,8 +39,6 @@ Then open **http://localhost:3000**.
 The first run creates `inventory.db` and fills it with four starter products. Node may print an `ExperimentalWarning` about SQLite, which is expected. To reset the data, stop the server, delete `inventory.db`, and start it again.
 
 To restart the server automatically when files change while you're developing, run `node --watch server.js` instead.
-
-Demo resets when it restarts.
 
 ## Future Improvements
 
