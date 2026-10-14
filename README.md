@@ -8,6 +8,8 @@ A web app for tracking a clothing store's inventory. View products, add, edit an
 
 The first load after a quiet period can take up to a minute, and the data resets to the starter products whenever the service restarts.
 
+Use **Reset demo data** to restore the starter products.
+
 ## Features
 
 - View products with category, price, quantity and reorder level
