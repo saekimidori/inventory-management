@@ -93,6 +93,16 @@ app.delete('/api/products/:id', function(req, res) {
   res.status(204).end()
 })
 
+// Demo only: restore the starter products. Remove or protect this route if real data is ever stored.
+app.post('/api/reset', function(req, res) {
+  try {
+    res.json(db.resetProducts())
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Something went wrong on the server.' })
+  }
+})
+
 app.listen(PORT, function() {
   console.log(`Server running at http://localhost:${PORT}`)
 })

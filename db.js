@@ -25,13 +25,15 @@ const starterProducts = [
   ['Running Sneakers', 'Footwear', 79.99, 7, 5]
 ]
 
-const { count } = db.prepare('SELECT COUNT(*) AS count FROM products').get()
-if (count === 0) {
+function seedStarterProducts() {
   const insert = db.prepare(
     'INSERT INTO products (name, category, price, quantity, reorder_level) VALUES (?, ?, ?, ?, ?)'
   )
   starterProducts.forEach(function(row) { insert.run(...row) })
 }
+
+const { count } = db.prepare('SELECT COUNT(*) AS count FROM products').get()
+if (count === 0) seedStarterProducts()
 
 function toProduct(row) {
   return {
@@ -73,6 +75,20 @@ function deleteProduct(id) {
   return db.prepare('DELETE FROM products WHERE id = ?').run(id).changes > 0
 }
 
+function resetProducts() {
+  db.exec('BEGIN')
+  try {
+    db.exec('DELETE FROM products')
+    db.exec("DELETE FROM sqlite_sequence WHERE name = 'products'")
+    seedStarterProducts()
+    db.exec('COMMIT')
+  } catch (error) {
+    db.exec('ROLLBACK')
+    throw error
+  }
+  return getAllProducts()
+}
+
 function isDuplicateError(error) {
   return Boolean(error && error.message && error.message.includes('UNIQUE constraint failed'))
 }
@@ -82,5 +98,6 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  resetProducts,
   isDuplicateError
 }

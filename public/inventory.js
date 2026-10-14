@@ -185,6 +185,26 @@ searchInput.addEventListener('input', renderInventory)
 categorySelect.addEventListener('change', renderInventory)
 sortSelect.addEventListener('change', renderInventory)
 
+const resetDemoButton = document.querySelector('#reset-demo')
+ 
+if (resetDemoButton) {
+  resetDemoButton.addEventListener('click', async function() {
+    if (!confirm('Reset all products to the starter data? Your changes will be lost.')) return
+ 
+    resetDemoButton.disabled = true
+    try {
+      inventory = await api('/api/reset', { method: 'POST' })
+    } catch (error) {
+      alert(error.message)
+      return
+    } finally {
+      resetDemoButton.disabled = false
+    }
+ 
+    refresh()
+  })
+}
+
 clearFiltersButton.addEventListener('click', function() {
   searchInput.value = ''
   categorySelect.value = 'all'
