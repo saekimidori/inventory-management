@@ -2,6 +2,8 @@
 
 A web app for tracking a clothing store's inventory. View products, add, edit and delete them, search and filter, and see at a glance what's running low.
 
+## Live Demo
+
 [See live demo](https://inventory-management-mddm.onrender.com/)
 
 The first load after a quiet period can take up to a minute, and the data resets to the starter products whenever the service restarts.
