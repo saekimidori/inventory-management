@@ -46,28 +46,37 @@
       <h2>Inventory</h2>
 
       <div id="inventory-controls">
-        <input
+        <div class="control-group">
+          <label for="search-input">Search</label>
+          <input
           type="search"
           id="search-input"
           placeholder="Search products..."
-        >
+          >
+        </div>
+        
+        <div class="control-group">
+          <label for="category-select">Category</label>
+          <select id="category-select">
+            <option value="all">All Categories</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="footwear">Footwear</option>
+          </select>
+        </div>
 
-        <select id="category-select">
-          <option value="all">All Categories</option>
-          <option value="tops">Tops</option>
-          <option value="bottoms">Bottoms</option>
-          <option value="outerwear">Outerwear</option>
-          <option value="footwear">Footwear</option>
-        </select>
-
-        <select id="sort-select">
-          <option value="default">Sort By</option>
-          <option value="name">Name</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="quantity-low">Quantity: Low to High</option>
-          <option value="quantity-high">Quantity: High to Low</option>
-        </select>
+        <div class="control-group">
+          <label for="sort-select">Sort By</label>
+          <select id="sort-select">
+            <option value="default">Default order</option>
+            <option value="name">Name</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="quantity-low">Quantity: Low to High</option>
+            <option value="quantity-high">Quantity: High to Low</option>
+          </select>
+        </div>
 
         <button type="button" id="clear-filters">Clear filters</button>
         <button type="button" id="reset-demo">Reset demo data</button>
