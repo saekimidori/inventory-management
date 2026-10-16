@@ -286,7 +286,7 @@ const formSubmitButton = productForm.querySelector("button[type='submit']")
 const formError = document.createElement('p')
 formError.id = 'product-form-error'
 formError.setAttribute('role', 'alert')
-formError.style.color = '#d9534f'
+formError.style.color = '#b42318'
 formError.hidden = true
 formSubmitButton.before(formError)
  

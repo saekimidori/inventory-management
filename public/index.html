@@ -82,12 +82,12 @@
         <button type="button" id="reset-demo">Reset demo data</button>
         <button id="add-product">Add Product</button>
         
-        <dialog id="product-form-container">
+        <dialog id="product-form-container" aria-labelledby="product-form-title">
           <h2 id="product-form-title">Add Product</h2>
 
           <form id="product-form">
             <label for="product-name">Product Name</label>
-            <input type="text" id="product-name" required>
+            <input type="text" id="product-name" autofocus required>
 
             <label for="product-category">Category</label>
             <select id="product-category" required>
