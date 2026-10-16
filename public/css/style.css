@@ -80,9 +80,25 @@ button:hover {
 /* Inventory controls */
 
 #inventory-controls {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+}
+
+.control-group {
+  flex: 1 1 10rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.control-group:first-child {
+  flex: 2 1 16rem;
 }
 
 #inventory-controls input,
@@ -96,12 +112,9 @@ button:hover {
   border-radius: 8px;
 }
 
-#inventory-controls input {
-  flex: 1;
-}
-
 #inventory-controls button {
   font-size: 1rem;
+  padding: 10px;  
 }
 
 /* Inventory list */
@@ -188,10 +201,6 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  #inventory-controls {
-    flex-direction: column;
-  }
-
   #inventory-list {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -199,15 +208,22 @@ button:hover {
 
 @media (max-width: 480px) {
   #summary-cards {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
-  #inventory-controls {
-    flex-direction: column;
+  .control-group,
+  .control-group:first-child {
+    flex: 1 1 100%;
   }
 
-  #inventory-list {
-    grid-template-columns: 1fr;
+  #inventory-controls > button {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+
+  #add-product {
+    flex-basis: 100%;
   }
 
   #product-form {
