@@ -32,7 +32,7 @@ const comparators = {
 
 // Search -> filter -> sort. A pure function: same inputs always give the same list,
 // and it never changes the products array it's given.
-export function getVisibleProducts(products, { search, category, sort }) {
+export function getVisibleProducts(products, { search, category, sort, frozenOrder = null }) {
   const query = search.trim().toLowerCase()
 
   const result = products.filter((product) => {
@@ -43,8 +43,12 @@ export function getVisibleProducts(products, { search, category, sort }) {
     return matchesSearch && matchesCategory
   })
 
-  const compare = comparators[sort] // undefined for "default": keep the original order
-  if (compare) result.sort(compare)
+  if (frozenOrder) {
+    result.sort((a, b) => frozenOrder.indexOf(a.id) - frozenOrder.indexOf(b.id))
+  } else {
+    const compare = comparators[sort]
+    if (compare) result.sort(compare)
+  }
 
   return result
 }

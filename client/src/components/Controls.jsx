@@ -8,7 +8,8 @@ export default function Controls({
   onCategoryChange,
   sort,
   onSortChange,
-  onClear
+  onClear,
+  onReset
 }) {
   return (
     <div id="inventory-controls">
@@ -57,6 +58,10 @@ export default function Controls({
 
       <button type="button" id="clear-filters" onClick={onClear}>
         Clear filters
+      </button>
+
+      <button type="button" id="reset-demo" onClick={onReset}>
+        Reset demo data
       </button>
     </div>
   )

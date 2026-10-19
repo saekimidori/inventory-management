@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { getProducts } from "./api"
+import { useEffect, useRef, useState } from "react"
+import { deleteProduct, getProducts, resetProducts, updateProduct } from "./api"
 import { getVisibleProducts } from "./utils"
 import SummaryCards from "./components/SummaryCards"
 import Controls from "./components/Controls"
@@ -16,6 +16,9 @@ export default function App() {
   const [category, setCategory] = useState("all")
   const [sort, setSort] = useState("default")
 
+  const [frozenOrder, setFrozenOrder] = useState(null)
+
+  const busyIds = useRef(new Set())
   // Runs once, after the first render: load the products from the server
   useEffect(() => {
     let ignore = false // if the component goes away before the reply arrives, don't update it
@@ -39,12 +42,64 @@ export default function App() {
 
   // Worked out fresh on every render. It's not state, because it can always be
   // recalculated from products + search + category + sort.
-  const visibleProducts = getVisibleProducts(products, { search, category, sort })
+  const visibleProducts = getVisibleProducts(products, { search, category, sort, frozenOrder })
+
+  function changeControl(setter) {
+    return (value) => {
+      setter(value)
+      setFrozenOrder(null)
+    }
+  }
 
   function clearFilters() {
     setSearch("")
     setCategory("all")
     setSort("default")
+    setFrozenOrder(null)
+  }
+
+  async function runOnce (id, action) {
+    if (busyIds.current.has(id)) return
+    busyIds.current.add(id)
+    try {
+      await action()
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      busyIds.current.delete(id)
+    }
+  }
+
+  function handleAdjust(product, change) {
+    const quantity = Math.max(0, product.quantity + change)
+    if (quantity === product.quantity) return
+
+    const orderBeforeChange = visibleProducts.map((item) => item.id)
+
+    runOnce(product.id, async () => {
+      const updated = await updateProduct(product.id, { ...product, quantity })
+      setFrozenOrder((current) => current ?? orderBeforeChange)
+      setProducts((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+    })
+  }
+
+  function handleDelete(product) {
+    if (!confirm(`Delete "${product.name}"?`)) return
+    
+    runOnce(product.id, async () => {
+      await deleteProduct(product.id)
+      setFrozenOrder(null)
+      setProducts((current) => current.filter((item) => item.id !== product.id))
+    })
+  }
+
+  function handleReset() {
+    if (!confirm("Reset all products to the starter data? Your changes will be lost.")) return
+
+    runOnce("reset", async() => {
+      setProducts(await resetProducts())
+      setFrozenOrder(null)
+    })
   }
 
   return (
@@ -68,6 +123,7 @@ export default function App() {
             sort={sort}
             onSortChange={setSort}
             onClear={clearFilters}
+            onReset={handleReset}
           />
 
           {status === "ready" && (
@@ -92,7 +148,12 @@ export default function App() {
 
           <div id="inventory-list">
             {visibleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAdjust={handleAdjust}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         </section>
