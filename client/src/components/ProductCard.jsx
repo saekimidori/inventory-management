@@ -1,6 +1,6 @@
 import { currency, getReorderLevel, getStockLabel, isLowStock } from "../utils"
 
-export default function ProductCard({ product, onAdjust, onDelete }) {
+export default function ProductCard({ product, onAdjust, onEdit, onDelete }) {
   const label = getStockLabel(product)
 
   return (
@@ -34,6 +34,9 @@ export default function ProductCard({ product, onAdjust, onDelete }) {
         </button>
       </div>
 
+      <button type="button" className="edit-product" onClick={() => onEdit(product)}>
+        Edit
+      </button>
       <button type="button" className="delete-product" onClick={() => onDelete(product)}>
         Delete
       </button>

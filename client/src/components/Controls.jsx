@@ -9,7 +9,8 @@ export default function Controls({
   sort,
   onSortChange,
   onClear,
-  onReset
+  onReset,
+  onAdd
 }) {
   return (
     <div id="inventory-controls">
@@ -62,6 +63,10 @@ export default function Controls({
 
       <button type="button" id="reset-demo" onClick={onReset}>
         Reset demo data
+      </button>
+
+      <button type="button" id="add-product" onClick={onAdd}>
+        Add Product
       </button>
     </div>
   )

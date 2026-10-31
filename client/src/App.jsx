@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { deleteProduct, getProducts, resetProducts, updateProduct } from "./api"
+import { createProduct, deleteProduct, getProducts, resetProducts, updateProduct } from "./api"
 import { getVisibleProducts } from "./utils"
 import SummaryCards from "./components/SummaryCards"
 import Controls from "./components/Controls"
 import ProductCard from "./components/ProductCard"
+import ProductDialog from "./components/ProductDialog"
 
 const RESORT_DELAY_MS = 1500
 
@@ -17,6 +18,8 @@ export default function App() {
   const [sort, setSort] = useState("default")
 
   const [frozenOrder, setFrozenOrder] = useState(null)
+
+  const [dialog, setDialog] = useState({ open: false, product: null })
 
   const busyIds = useRef(new Set())
 
@@ -43,8 +46,6 @@ export default function App() {
     }
   }, [])
 
-  // Worked out fresh on every render. It's not state, because it can always be
-  // recalculated from products + search + category + sort.
   const visibleProducts = getVisibleProducts(products, { search, category, sort, frozenOrder })
 
   function changeControl(setter) {
@@ -89,6 +90,30 @@ export default function App() {
     })
   }
 
+  function openAddDialog() {
+    setDialog({ open: true, product: null })
+  }
+
+  function openEditDialog(product) {
+    setDialog({ open: true, product })
+  }
+
+  function closeDialog() {
+    setDialog((current) => ({ ...current, open: false }))
+  }
+
+  async function handleSave(data) {
+    if (dialog.product) {
+      const updated = await updateProduct(dialog.product.id, data)
+      setProducts((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+    } else {
+      const created = await createProduct(data)
+      setProducts((current) => [...current, created])
+    }
+    setFrozenOrder(null)
+    closeDialog()
+  }
+
   function handleDelete(product) {
     if (!confirm(`Delete "${product.name}"?`)) return
     
@@ -130,6 +155,7 @@ export default function App() {
             onSortChange={setSort}
             onClear={clearFilters}
             onReset={handleReset}
+            onAdd={openAddDialog}
           />
 
           {status === "ready" && (
@@ -158,12 +184,20 @@ export default function App() {
                 key={product.id} 
                 product={product} 
                 onAdjust={handleAdjust}
+                onEdit={openEditDialog}
                 onDelete={handleDelete}
               />
             ))}
           </div>
         </section>
       </main>
+
+      <ProductDialog
+        open={dialog.open}
+        product={dialog.product}
+        onClose={closeDialog}
+        onSave={handleSave}
+      />
     </>
   )
 }
