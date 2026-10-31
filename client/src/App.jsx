@@ -5,13 +5,13 @@ import SummaryCards from "./components/SummaryCards"
 import Controls from "./components/Controls"
 import ProductCard from "./components/ProductCard"
 
+const RESORT_DELAY_MS = 1500
+
 export default function App() {
-  // The data from the server
   const [products, setProducts] = useState([])
-  const [status, setStatus] = useState("loading") // "loading" | "ready" | "error"
+  const [status, setStatus] = useState("loading")
   const [errorMessage, setErrorMessage] = useState("")
 
-  // What the person has typed or picked in the controls
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("all")
   const [sort, setSort] = useState("default")
@@ -19,9 +19,12 @@ export default function App() {
   const [frozenOrder, setFrozenOrder] = useState(null)
 
   const busyIds = useRef(new Set())
-  // Runs once, after the first render: load the products from the server
+
+  const resortTimer = useRef(null)
+  useEffect(() => () => clearTimeout(resortTimer.current), [])
+
   useEffect(() => {
-    let ignore = false // if the component goes away before the reply arrives, don't update it
+    let ignore = false 
 
     getProducts()
       .then((data) => {
@@ -80,6 +83,9 @@ export default function App() {
       const updated = await updateProduct(product.id, { ...product, quantity })
       setFrozenOrder((current) => current ?? orderBeforeChange)
       setProducts((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+
+      clearTimeout(resortTimer.current)
+      resortTimer.current = setTimeout(() => setFrozenOrder(null), RESORT_DELAY_MS)
     })
   }
 
