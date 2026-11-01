@@ -9,7 +9,7 @@ const CATEGORIES = ['Tops', 'Bottoms', 'Outerwear', 'Footwear']
 
 app.use(express.json())
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'client', 'dist')))
 
 function validateProduct(body) {
   if (!body || typeof body !== 'object') return { error: 'Request body must be JSON.' }
