@@ -16,6 +16,7 @@ Use **Reset demo data** to restore the starter products.
 - Add, edit and delete products
 - Search by name or category, filter by category, and sort by name, price or quantity
 - Quick `+` / `−` buttons to adjust a product's stock by one
+- Reset demo data button to restore the starter products.
 - 'Low stock' and 'out of stock' labels, based on each product's own reorder level
 - Inventory summary: total products, total units, inventory value and low stock count
 - Duplicate protection: the same name can't exist twice in one category
@@ -23,30 +24,71 @@ Use **Reset demo data** to restore the starter products.
 
 ## Tech stack
 
-- **Frontend:** HTML, CSS and JavaScript
+- **Frontend:** React, built with Vite
 - **Backend:** Node.js with Express
 - **Database:** SQLite, using Node's built-in `node:sqlite` module
 
+A plain JavaScript version of the frontend, from before the React rewrite, is on the [`vanilla-js` branch](https://github.com/saekimidori/inventory-management/tree/vanilla-js).
+
 ## Run locally
 
-You need [Node.js](https://nodejs.org) 24 (built and tested with v24.13.1).
+You need [Node.js](https://nodejs.org) 24.
 
 ```bash
 git clone https://github.com/saekimidori/inventory-management.git
 cd inventory-management
 npm install
-node server.js
 ```
 
-Then open **http://localhost:3000**.
+**Production-style (one server):**
 
-The first run creates `inventory.db` and fills it with four starter products. Node may print an `ExperimentalWarning` about SQLite, which is expected. To reset the data, stop the server, delete `inventory.db`, and start it again.
+```bash
+npm run build
+npm start
+```
 
-To restart the server automatically when files change while you're developing, run `node --watch server.js` instead.
+Open **http://localhost:3000**.
+
+**Development (with live reload):**
+
+```bash
+# terminal 1, in the project root
+node --watch server.js
+
+# terminal 2
+npm install --prefix client
+npm run dev --prefix client
+```
+
+Open **http://localhost:5173**. The dev server forwards `/api` requests to the Express server on port 3000.
+
+The first run creates `inventory.db` and fills it with four starter products. To reset the data, stop the server, delete `inventory.db`, and start it again.
+
+## Project structure
+
+```
+.
+├── server.js           Express server and API routes
+├── db.js               SQLite setup and database functions
+├── package.json
+└── client/             React frontend (Vite)
+    ├── index.html
+    ├── vite.config.js
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── api.js      Requests to the API
+        ├── utils.js    Filtering, sorting and stock helpers
+        ├── index.css
+        └── components/
+            ├── Controls.jsx
+            ├── ProductCard.jsx
+            ├── ProductDialog.jsx
+            └── SummaryCards.jsx
+```
 
 ## Future Improvements
 
-- Deploy it so it can be used from more than one device
 - Add a login, since anyone who can reach the server can currently change stock
 - Add automated tests for the API
 - Export the inventory to CSV
