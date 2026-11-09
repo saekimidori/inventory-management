@@ -10,6 +10,8 @@ export default function Controls({
   onSortChange,
   onClear,
   onReset,
+  onExport,
+  canExport,
   onAdd
 }) {
   return (
@@ -63,6 +65,10 @@ export default function Controls({
 
       <button type="button" id="reset-demo" onClick={onReset}>
         Reset demo data
+      </button>
+
+      <button type="button" id="export-csv" onClick={onExport} disabled={!canExport}>
+        Export CSV
       </button>
 
       <button type="button" id="add-product" onClick={onAdd}>

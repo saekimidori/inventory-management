@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { createProduct, deleteProduct, getProducts, resetProducts, updateProduct } from "./api"
 import { getVisibleProducts } from "./utils"
+import { downloadCsv, productsToCsv } from "./csv"
 import SummaryCards from "./components/SummaryCards"
 import Controls from "./components/Controls"
 import ProductCard from "./components/ProductCard"
@@ -152,6 +153,11 @@ export default function App() {
     setPendingDelete(null)
   }
 
+  function handleExport() {
+    const today = new Date().toLocaleDateString("en-CA")
+    downloadCsv(`inventory-${today}.csv`, productsToCsv(visibleProducts))
+  }
+
   function handleReset() {
     if (!confirm("Reset all products to the starter data? Your changes will be lost.")) return
 
@@ -185,6 +191,8 @@ export default function App() {
             onSortChange={setSort}
             onClear={clearFilters}
             onReset={handleReset}
+            onExport={handleExport}
+            canExport={visibleProducts.length > 0}
             onAdd={openAddDialog}
           />
 
