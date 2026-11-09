@@ -5,8 +5,11 @@ import SummaryCards from "./components/SummaryCards"
 import Controls from "./components/Controls"
 import ProductCard from "./components/ProductCard"
 import ProductDialog from "./components/ProductDialog"
+import UndoToast from "./components/UndoToast"
 
 const RESORT_DELAY_MS = 1500
+
+const UNDO_WINDOW_MS = 6000
 
 export default function App() {
   const [products, setProducts] = useState([])
@@ -21,10 +24,14 @@ export default function App() {
 
   const [dialog, setDialog] = useState({ open: false, product: null })
 
+  const [pendingDelete, setPendingDelete] = useState(null)
+  const deleteTimer = useRef(null)
+
   const busyIds = useRef(new Set())
 
   const resortTimer = useRef(null)
   useEffect(() => () => clearTimeout(resortTimer.current), [])
+  useEffect(() => () => clearTimeout(deleteTimer.current), [])
 
   useEffect(() => {
     let ignore = false 
@@ -46,7 +53,11 @@ export default function App() {
     }
   }, [])
 
-  const visibleProducts = getVisibleProducts(products, { search, category, sort, frozenOrder })
+  const shownProducts = pendingDelete
+    ? products.filter((item) => item.id !== pendingDelete.id)
+    : products
+
+  const visibleProducts = getVisibleProducts(shownProducts, { search, category, sort, frozenOrder })
 
   function changeControl(setter) {
     return (value) => {
@@ -114,18 +125,37 @@ export default function App() {
     closeDialog()
   }
 
-  function handleDelete(product) {
-    if (!confirm(`Delete "${product.name}"?`)) return
-    
-    runOnce(product.id, async () => {
+  async function commitDelete(product) {
+    try {
       await deleteProduct(product.id)
-      setFrozenOrder(null)
       setProducts((current) => current.filter((item) => item.id !== product.id))
-    })
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setPendingDelete((current) => (current?.id === product.id ? null : current))
+    }
+  }
+
+  function handleDelete(product) {
+    if (pendingDelete) {
+      clearTimeout(deleteTimer.current)
+      commitDelete(pendingDelete)
+    }
+
+    setFrozenOrder(null)
+    setPendingDelete(product)
+    deleteTimer.current = setTimeout(() => commitDelete(product), UNDO_WINDOW_MS)
+  }
+
+  function cancelPendingDelete() {
+    clearTimeout(deleteTimer.current)
+    setPendingDelete(null)
   }
 
   function handleReset() {
     if (!confirm("Reset all products to the starter data? Your changes will be lost.")) return
+
+    cancelPendingDelete()
 
     runOnce("reset", async() => {
       setProducts(await resetProducts())
@@ -195,9 +225,12 @@ export default function App() {
       <ProductDialog
         open={dialog.open}
         product={dialog.product}
+        products={products}
         onClose={closeDialog}
         onSave={handleSave}
       />
+
+      <UndoToast product={pendingDelete} onUndo={cancelPendingDelete} />
     </>
   )
 }
