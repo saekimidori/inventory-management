@@ -156,6 +156,10 @@ button:hover {
   cursor: not-allowed; 
 }
 
+article button {
+  margin-right: 0.5rem;
+}
+
 #product-form-container::backdrop {
   background: #00000080;
 }
