@@ -153,9 +153,17 @@ export default function App() {
     setPendingDelete(null)
   }
 
-  function handleExport() {
-    const today = new Date().toLocaleDateString("en-CA")
-    downloadCsv(`inventory-${today}.csv`, productsToCsv(visibleProducts))
+  const filtersActive = search.trim() !== "" || category !== "all"
+
+  function handleExport(scope) {
+    const exportAll = scope === "all"
+    const list = exportAll
+      ? getVisibleProducts(shownProducts, { search: "", category: "all", sort, frozenOrder })
+      : visibleProducts
+
+    const today = new Date().toLocaleDateString("en-CA") // 2026-10-27 style
+    const prefix = filtersActive && !exportAll ? "inventory-filtered" : "inventory"
+    downloadCsv(`${prefix}-${today}.csv`, productsToCsv(list))
   }
 
   function handleReset() {
@@ -192,7 +200,9 @@ export default function App() {
             onClear={clearFilters}
             onReset={handleReset}
             onExport={handleExport}
-            canExport={visibleProducts.length > 0}
+            exportCount={visibleProducts.length}
+            totalCount={shownProducts.length}
+            filtersActive={filtersActive}
             onAdd={openAddDialog}
           />
 

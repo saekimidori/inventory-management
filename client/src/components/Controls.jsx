@@ -1,6 +1,5 @@
 import { CATEGORIES } from "../utils"
 
-// Controls owns no state. It shows the values it's given and reports changes upward.
 export default function Controls({
   search,
   onSearchChange,
@@ -11,7 +10,9 @@ export default function Controls({
   onClear,
   onReset,
   onExport,
-  canExport,
+  exportCount,
+  totalCount,
+  filtersActive,
   onAdd
 }) {
   return (
@@ -67,9 +68,25 @@ export default function Controls({
         Reset demo data
       </button>
 
-      <button type="button" id="export-csv" onClick={onExport} disabled={!canExport}>
-        Export CSV
+      <button
+        type="button"
+        id="export-csv"
+        onClick={() => onExport("visible")}
+        disabled={exportCount === 0}
+      >
+        {filtersActive ? "Export filtered" : "Export CSV"} ({exportCount})
       </button>
+
+      {filtersActive && (
+        <button
+          type="button"
+          id="export-all-csv"
+          onClick={() => onExport("all")}
+          disabled={totalCount === 0}
+        >
+          Export all ({totalCount})
+        </button>
+      )}
 
       <button type="button" id="add-product" onClick={onAdd}>
         Add Product
